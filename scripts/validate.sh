@@ -126,8 +126,13 @@ check_file "README.md"
 check_file "AGENTS.md"
 check_file "CONTRIBUTING.md"
 check_file "SECURITY.md"
+check_file "docs/PRD.md"
+check_file "docs/TASKS.md"
+check_file "docs/ORCHESTRATION.md"
+check_file "docs/orchestration.json"
 check_file ".github/pull_request_template.md"
 check_file "scripts/validate.sh"
+check_file "scripts/smoke.sh"
 
 printf '\nChecking runbooklint required directories...\n'
 
