@@ -49,6 +49,12 @@ export function lintDocument(cwd: string, doc: MarkdownDocument, policy: Policy)
     findings.push(finding('stale-placeholder', 'warning', file, todo.line, 'Placeholder text remains in the runbook.', 'Replace TODO/TBD/FIXME placeholders before operational use.'));
   }
 
+  for (const item of doc.checklistItems) {
+    if (!item.checked) {
+      findings.push(finding('unchecked-task', 'info', file, item.line, 'Checklist item is not complete.', 'Complete the item or move it to prerequisites before operational use.'));
+    }
+  }
+
   for (const banned of policy.bannedPhrases) {
     const phrase = banned.phrase.toLowerCase();
     doc.lines.forEach((line, index) => {
