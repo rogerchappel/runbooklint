@@ -1,0 +1,28 @@
+{
+  "name": "runbooklint",
+  "mode": "local-first-cli",
+  "commands": [
+    {
+      "name": "init",
+      "purpose": "write a starter .runbooklint.json policy",
+      "sideEffects": ["creates .runbooklint.json unless --print is used"]
+    },
+    {
+      "name": "check",
+      "purpose": "lint Markdown runbooks and emit deterministic reports",
+      "sideEffects": ["writes a report only when --output is supplied"]
+    }
+  ],
+  "qualityGates": [
+    "npm test",
+    "npm run check",
+    "npm run build",
+    "npm run smoke",
+    "bash scripts/validate.sh"
+  ],
+  "nonGoals": [
+    "execute runbook commands",
+    "call hosted APIs",
+    "replace human incident review"
+  ]
+}
