@@ -62,7 +62,14 @@ function main(argv: string[]): number {
     const failOn = assertSeverity(take(args, '--fail-on', 'error'));
     const output = take(args, '--output');
     const policyPath = take(args, '--policy');
-    const { output: rendered, failed } = runCheck({ cwd: process.cwd(), paths: args, format, failOn, output, policyPath });
+    const { output: rendered, failed } = runCheck({
+      cwd: process.cwd(),
+      paths: args,
+      format,
+      failOn,
+      ...(output ? { output } : {}),
+      ...(policyPath ? { policyPath } : {})
+    });
     if (!output) process.stdout.write(rendered);
     return failed ? 1 : 0;
   }
