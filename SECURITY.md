@@ -1,58 +1,32 @@
 # Security Policy
 
-## Supported Versions
+RunbookLint is a local-first CLI. It parses Markdown and emits reports; it does not execute commands from runbooks and does not call external services.
 
-Replace this section with the supported versions for `runbooklint`.
+## Supported versions
 
-Example:
+Security fixes target the latest released minor version. Before a public release, fixes land on `main`.
 
-```md
-| Version | Supported |
-| --- | --- |
-| .x | Yes |
-| < .0 | No |
-```
+## Reporting a vulnerability
 
-If the project does not publish versioned releases yet, say that clearly.
+Please report suspected vulnerabilities by opening a private GitHub security advisory or emailing the maintainer if advisories are unavailable. Include:
 
-## Reporting a Vulnerability
+- The affected version or commit.
+- A minimal reproduction.
+- Expected and actual behavior.
+- Whether the issue can expose secrets, corrupt files, or cause command execution.
 
-Please do not report suspected vulnerabilities in public issues, pull requests, or discussions.
+Do not include real credentials, private incident details, or production runbooks in reports.
 
-Ask maintainers for the private security reporting path before sharing details.
-
-If no private reporting path exists yet, ask maintainers through public project channels for a private reporting path. Do not include exploit details, secrets, personal data, or sensitive technical details in public messages.
-
-## What to Include
-
-When a private reporting path is available, include:
-
-- A clear description of the issue.
-- Affected versions, files, packages, workflows, or configuration.
-- Steps to reproduce, proof of concept, or attack scenario when safe to share.
-- Potential impact.
-- Suggested mitigation, if known.
-
-## Response Expectations
-
-Maintainers review good-faith reports as capacity allows.
-
-Do not imply paid support, guaranteed response times, guaranteed fixes, or service-level agreements unless `runbooklint` explicitly provides them.
-
-## Scope
+## Security boundaries
 
 In scope:
 
-- Vulnerabilities in runbooklint.
-- Insecure default configuration shipped by this project.
-- CI, release, or dependency guidance maintained by this project.
+- Unexpected file writes outside requested output paths.
+- Unsafe parsing behavior that can crash on ordinary Markdown.
+- Packaging mistakes that could cause the CLI to execute runbook content.
 
 Out of scope:
 
-- General support requests.
-- Requests for guaranteed maintenance timelines.
-- Issues in unrelated downstream projects.
-
-## Disclosure
-
-Coordinate disclosure with maintainers before publishing vulnerability details.
+- Findings that are false positives or false negatives unless they create a direct security vulnerability.
+- Vulnerabilities in user-authored commands, because RunbookLint never runs them.
+- Issues requiring local machine compromise before invoking the CLI.
