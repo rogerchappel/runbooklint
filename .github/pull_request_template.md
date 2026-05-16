@@ -4,7 +4,11 @@
 
 ## Verification
 
-- [ ] Tests or checks run:
+- [ ] `npm test`
+- [ ] `npm run check`
+- [ ] `npm run build`
+- [ ] `npm run smoke`
+- [ ] `bash scripts/validate.sh`
 - [ ] Manual review completed:
 
 ## Risk Level
