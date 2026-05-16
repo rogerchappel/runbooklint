@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-import { existsSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { presetPolicy } from './policy.js';
 import { runCheck } from './index.js';
 import type { Severity } from './types.js';
 
 function usage(): string {
-  return `RunbookLint\n\nUsage:\n  runbooklint check [paths...] [--format markdown|json] [--fail-on info|warning|error] [--output file] [--policy file]\n  runbooklint init [--preset oss-release|incident|agent-handoff] [--print] [--force]\n  runbooklint --help\n`;
+  return `RunbookLint\n\nUsage:\n  runbooklint check [paths...] [--format markdown|json] [--fail-on info|warning|error] [--output file] [--policy file]\n  runbooklint init [--preset oss-release|incident|agent-handoff] [--print] [--force]\n  runbooklint --version\n  runbooklint --help\n`;
 }
 
 function take(args: string[], flag: string, fallback?: string): string | undefined {
@@ -32,6 +32,13 @@ function assertSeverity(value: string | undefined): Severity {
 
 function main(argv: string[]): number {
   const args = [...argv];
+  if (has(args, '--version')) {
+    const url = new URL('../package.json', import.meta.url);
+    const pkg = JSON.parse(readFileSync(url, 'utf8')) as { version: string };
+    process.stdout.write(`${pkg.version}\n`);
+    return 0;
+  }
+
   if (args.length === 0 || has(args, '--help') || has(args, '-h')) {
     process.stdout.write(usage());
     return 0;
