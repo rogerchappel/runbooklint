@@ -1,0 +1,14 @@
+{
+  "requiredHeadings": [
+    "purpose",
+    "scope",
+    "prerequisites",
+    "procedure",
+    "validation",
+    "rollback"
+  ],
+  "ownerHeadings": ["owner", "contacts"],
+  "environmentHeadings": ["scope", "environment"],
+  "requiredVariableDefinitions": ["OWNER", "TARGET_ENV"],
+  "allowMissingOwner": false
+}
