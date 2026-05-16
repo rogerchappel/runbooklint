@@ -27,6 +27,16 @@ export function lintDocument(cwd: string, doc: MarkdownDocument, policy: Policy)
   const file = relative(cwd, doc.path) || doc.path;
   const findings: Finding[] = [];
 
+  const seenHeadings = new Map<string, number>();
+  for (const heading of doc.headings) {
+    const previous = seenHeadings.get(heading.slug);
+    if (previous) {
+      findings.push(finding('duplicate-heading', 'info', file, heading.line, `Duplicate heading also appears on line ${previous}: ${heading.text}.`, 'Rename or merge duplicate sections to reduce ambiguity.'));
+    } else {
+      seenHeadings.set(heading.slug, heading.line);
+    }
+  }
+
   for (const required of policy.requiredHeadings) {
     if (!hasHeading(doc, [required])) {
       findings.push(finding('missing-heading', 'error', file, 1, `Missing required heading: ${required}.`, `Add a '${required}' section with concrete instructions.`));
