@@ -52,7 +52,7 @@ node dist/cli.js check fixtures --format json --output reports/runbooklint.json
 
 ## Policy configuration
 
-RunbookLint loads `.runbooklint.json` from the current directory unless `--policy` is supplied.
+RunbookLint loads `.runbooklint.json` from the current directory unless `--policy` is supplied. See [docs/POLICY.md](docs/POLICY.md) for the full policy reference.
 
 ```json
 {
