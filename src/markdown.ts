@@ -68,3 +68,12 @@ export function firstHeadingLine(doc: MarkdownDocument, candidates: string[]): n
   const wanted = new Set(candidates.map(slugify));
   return doc.headings.find((heading) => wanted.has(heading.slug))?.line ?? 1;
 }
+
+export function sectionText(doc: MarkdownDocument, candidate: string): string | undefined {
+  const slug = slugify(candidate);
+  const headingIndex = doc.headings.findIndex((heading) => heading.slug === slug);
+  const heading = doc.headings[headingIndex];
+  if (!heading) return undefined;
+  const next = doc.headings.slice(headingIndex + 1).find((item) => item.level <= heading.level);
+  return doc.lines.slice(heading.line, (next?.line ?? doc.lines.length + 1) - 1).join('\n').trim();
+}

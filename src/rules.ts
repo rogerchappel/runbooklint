@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { dirname, resolve, relative } from 'node:path';
 import type { Finding, MarkdownDocument, Policy, Severity } from './types.js';
-import { firstHeadingLine, hasHeading } from './markdown.js';
+import { firstHeadingLine, hasHeading, sectionText } from './markdown.js';
 
 const severityRank: Record<Severity, number> = { info: 0, warning: 1, error: 2 };
 
@@ -40,6 +40,8 @@ export function lintDocument(cwd: string, doc: MarkdownDocument, policy: Policy)
   for (const required of policy.requiredHeadings) {
     if (!hasHeading(doc, [required])) {
       findings.push(finding('missing-heading', 'error', file, 1, `Missing required heading: ${required}.`, `Add a '${required}' section with concrete instructions.`));
+    } else if ((sectionText(doc, required) ?? '').length < 8) {
+      findings.push(finding('empty-section', 'warning', file, firstHeadingLine(doc, [required]), `Required section is empty or too terse: ${required}.`, 'Add enough detail for another operator to follow safely.'));
     }
   }
 
