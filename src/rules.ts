@@ -51,6 +51,11 @@ export function lintDocument(cwd: string, doc: MarkdownDocument, policy: Policy)
   if (!hasHeading(doc, policy.environmentHeadings)) {
     findings.push(finding('missing-environment', 'warning', file, 1, 'Runbook does not clearly state environment scope.', 'Add the target environment, systems, accounts, regions, and exclusions.'));
   }
+  const procedure = sectionText(doc, 'procedure');
+  if (procedure && doc.codeFences.length === 0 && !/\b(open|click|verify|contact|review|copy|edit|restart|deploy|publish|run)\b/i.test(procedure)) {
+    findings.push(finding('weak-procedure', 'warning', file, firstHeadingLine(doc, ['procedure']), 'Procedure section may not contain actionable steps.', 'Add concrete ordered steps, commands, or decision points.'));
+  }
+
   if (doc.codeFences.length > 0 && !hasHeading(doc, policy.validationHeadings)) {
     findings.push(finding('missing-validation', 'error', file, 1, 'Runbook contains commands but no validation section.', 'Add post-change checks that prove success or safe failure.'));
   }
