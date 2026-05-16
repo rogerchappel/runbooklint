@@ -1,21 +1,12 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-This project follows the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
-format and uses semantic versioning when versioned releases are published.
-
-## [Unreleased]
+## 0.1.0 - Unreleased
 
 ### Added
 
-- Initial project setup.
-
-## Release Links
-
-- Unreleased:
-  `https://github.com/rogerchappel/runbooklint/compare/...HEAD`
-- Latest release:
-  `https://github.com/rogerchappel/runbooklint/releases/latest`
-
-Replace placeholder links once the first release tag exists.
+- Local-first `runbooklint check` command for Markdown files and directories.
+- `runbooklint init` with `oss-release`, `incident`, and `agent-handoff` policy presets.
+- Deterministic Markdown and JSON reports.
+- Policy-driven required headings, owner, environment, validation, rollback, banned phrase, variable, and command risk checks.
+- Fixtures for clean release, risky production, missing rollback, agent handoff, and structural issue runbooks.
+- Node tests, smoke checks, CI workflow, examples, and policy documentation.
