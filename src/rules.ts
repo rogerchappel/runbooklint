@@ -1,4 +1,5 @@
-import { relative } from 'node:path';
+import { existsSync } from 'node:fs';
+import { dirname, resolve, relative } from 'node:path';
 import type { Finding, MarkdownDocument, Policy, Severity } from './types.js';
 import { firstHeadingLine, hasHeading } from './markdown.js';
 
@@ -52,6 +53,15 @@ export function lintDocument(cwd: string, doc: MarkdownDocument, policy: Policy)
   for (const item of doc.checklistItems) {
     if (!item.checked) {
       findings.push(finding('unchecked-task', 'info', file, item.line, 'Checklist item is not complete.', 'Complete the item or move it to prerequisites before operational use.'));
+    }
+  }
+
+  for (const link of doc.links) {
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(link.href) && !link.href.startsWith('#')) {
+      const target = link.href.split('#')[0] ?? '';
+      if (target && !existsSync(resolve(dirname(doc.path), target))) {
+        findings.push(finding('broken-local-link', 'warning', file, link.line, `Local link target does not exist: ${link.href}.`, 'Update the link or add the referenced file.'));
+      }
     }
   }
 
