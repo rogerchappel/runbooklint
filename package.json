@@ -12,6 +12,7 @@
   },
   "files": [
     "dist",
+    "docs/POLICY.md",
     "README.md",
     "LICENSE"
   ],
