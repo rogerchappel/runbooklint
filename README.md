@@ -12,6 +12,14 @@ npm run build
 node dist/cli.js check fixtures/clean-release.md
 ```
 
+After publishing, install the CLI globally and run the same check from any
+repository:
+
+```sh
+npm install -g runbooklint
+runbooklint check docs --fail-on warning
+```
+
 Initialize a project policy:
 
 ```sh
@@ -101,8 +109,13 @@ npm test
 npm run check
 npm run build
 npm run smoke
+npm run package:smoke
+npm run release:check
 bash scripts/validate.sh
 ```
+
+`release:check` exercises the compiled CLI, fixture tests, smoke script, and
+dry-run package contents so the release candidate is reviewable before tagging.
 
 ## Contributing
 
