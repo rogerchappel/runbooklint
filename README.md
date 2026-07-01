@@ -4,7 +4,7 @@ RunbookLint is a local-first Markdown linter for operational runbooks. It turns 
 
 It never executes commands and never calls hosted APIs.
 
-## Quick start
+## Quickstart
 
 ```sh
 npm install
