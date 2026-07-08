@@ -21,3 +21,8 @@ test('missing rollback fixture reports rollback coverage gap', () => {
   const { result } = runCheck({ cwd: process.cwd(), paths: ['fixtures/missing-rollback.md'], format: 'markdown', failOn: 'error' });
   assert.ok(result.findings.some((finding) => finding.ruleId === 'missing-heading' && finding.message.includes('rollback')));
 });
+
+test('approval bypass wording is flagged in shell procedures', () => {
+  const { result } = runCheck({ cwd: process.cwd(), paths: ['fixtures/approval-bypass.md'], format: 'json', failOn: 'error' });
+  assert.ok(result.findings.some((finding) => finding.ruleId === 'approval-bypass'));
+});
