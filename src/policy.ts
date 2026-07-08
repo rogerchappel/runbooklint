@@ -51,6 +51,13 @@ export const defaultPolicy: Policy = {
       severity: 'info',
       message: 'Production command should have validation and rollback coverage.',
       suggestion: 'Ensure the runbook clearly states environment scope, validation, and rollback.'
+    },
+    {
+      id: 'approval-bypass',
+      pattern: String.raw`\b(skip|bypass|ignore)\b.{0,40}\b(approval|change freeze|review|sign[- ]off)\b`,
+      severity: 'warning',
+      message: 'Command wording appears to bypass an approval or review gate.',
+      suggestion: 'Replace bypass language with the required approval, reviewer, and escalation path.'
     }
   ]
 };
