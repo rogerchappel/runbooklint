@@ -7,8 +7,12 @@
     "runbooklint": "./dist/cli.js"
   },
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "files": [
     "dist",
@@ -28,7 +32,7 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build --silent && node --test --test-reporter=spec test/*.test.js",
     "smoke": "bash scripts/smoke.sh",
-    "package:smoke": "npm pack --dry-run",
+    "package:smoke": "npm run build && node scripts/package-smoke.mjs",
     "release:check": "npm test && npm run check && npm run build && npm run smoke && bash scripts/validate.sh && npm run package:smoke"
   },
   "keywords": [
