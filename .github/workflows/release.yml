@@ -62,7 +62,7 @@ jobs:
           path: release-artifacts
       - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
       - name: Publish verified package to npm
         run: npm publish release-artifacts/*.tgz --access public --provenance
