@@ -38,4 +38,11 @@ A good pull request includes:
 
 ## Release process
 
-Releases are manual. Maintainers should run `npm run release:check`, inspect the package with `npm pack --dry-run`, then publish intentionally.
+Before tagging, maintainers should run `npm run release:check` and review the
+release dry-run workflow. Pushing a `v*.*.*` tag verifies and packs the release
+candidate once, publishes that verified tarball to npm with trusted-publishing
+provenance, and only then creates the GitHub release with the same tarball.
+
+The npm package name and version must be available before a tag is pushed.
+Configure npm trusted publishing for this repository and the `release.yml`
+workflow; the workflow does not use a long-lived npm token.

@@ -12,8 +12,9 @@ npm run build
 node dist/cli.js check fixtures/clean-release.md
 ```
 
-After publishing, install the CLI globally and run the same check from any
-repository:
+The package is not yet available from npm. Until the first release is published,
+use the checkout commands above. After a release appears on npm, install the CLI
+globally and run the same check from any repository:
 
 ```sh
 npm install -g runbooklint
@@ -115,7 +116,9 @@ bash scripts/validate.sh
 ```
 
 `release:check` exercises the compiled CLI, fixture tests, smoke script, and
-dry-run package contents so the release candidate is reviewable before tagging.
+an installed CLI from the packed artifact so the release candidate is reviewable
+before tagging. Pull requests that change release inputs also run
+`npm publish --dry-run --access public`.
 
 ## Contributing
 

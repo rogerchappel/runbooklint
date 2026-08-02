@@ -10,3 +10,5 @@
 - Policy-driven required headings, owner, environment, validation, rollback, banned phrase, variable, and command risk checks.
 - Fixtures for clean release, risky production, missing rollback, agent handoff, and structural issue runbooks.
 - Node tests, smoke checks, CI workflow, examples, and policy documentation.
+- Release automation that dry-runs npm publication and publishes verified tag
+  artifacts with trusted-publishing provenance before creating a GitHub release.
