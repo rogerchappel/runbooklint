@@ -88,8 +88,13 @@ node dist/cli.js init --preset agent-handoff --print
 - run: npm test
 - run: npm run check
 - run: npm run build
-- run: node dist/cli.js check docs --fail-on warning
+- run: npm run docs:check
 ```
+
+`docs:check` lints `fixtures/clean-release.md`, an intentionally conforming
+runbook, and fails on warnings or errors. The repository's `docs/` directory
+contains product and policy reference documents rather than operational
+runbooks, so it is not used as the CI lint target.
 
 ## Safety model
 
@@ -109,6 +114,7 @@ npm install
 npm test
 npm run check
 npm run build
+npm run docs:check
 npm run smoke
 npm run package:smoke
 npm run release:check
