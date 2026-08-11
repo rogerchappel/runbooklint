@@ -31,11 +31,12 @@ export function collectMarkdownFiles(cwd: string, inputs: string[]): string[] {
   const patterns = readGitignore(cwd);
   const visited = new Set<string>();
   const out: string[] = [];
-  const queue = inputs.length > 0 ? inputs : ['.'];
+  const explicit = inputs.length > 0;
+  const queue = explicit ? inputs : ['.'];
 
-  function visit(abs: string): void {
+  function visit(abs: string, respectGitignore: boolean): void {
     const rel = relative(cwd, abs) || '.';
-    if (rel !== '.' && ignored(rel, patterns)) return;
+    if (respectGitignore && rel !== '.' && ignored(rel, patterns)) return;
     if (visited.has(abs)) return;
     visited.add(abs);
 
@@ -43,7 +44,7 @@ export function collectMarkdownFiles(cwd: string, inputs: string[]): string[] {
     if (stats.isDirectory()) {
       for (const entry of readdirSync(abs).sort((a, b) => a.localeCompare(b))) {
         if (entry === '.git' || entry === 'node_modules' || entry === 'dist') continue;
-        visit(resolve(abs, entry));
+        visit(resolve(abs, entry), respectGitignore);
       }
       return;
     }
@@ -51,6 +52,9 @@ export function collectMarkdownFiles(cwd: string, inputs: string[]): string[] {
     if (stats.isFile() && ['.md', '.markdown'].includes(extname(abs).toLowerCase())) out.push(abs);
   }
 
-  for (const input of queue) visit(resolve(cwd, input));
+  for (const input of queue) visit(resolve(cwd, input), !explicit);
+  if (explicit && out.length === 0) {
+    throw new Error(`No Markdown files found for explicit path${inputs.length === 1 ? '' : 's'}: ${inputs.join(', ')}`);
+  }
   return out.sort((a, b) => relative(cwd, a).localeCompare(relative(cwd, b)));
 }

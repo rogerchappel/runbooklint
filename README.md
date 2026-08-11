@@ -43,6 +43,10 @@ runbooklint init [--preset oss-release|incident|agent-handoff] [--print] [--forc
 ### Reports
 
 Markdown is the default report format. JSON is stable and deterministic for automation.
+Explicit file and directory paths are always checked, even when they match
+`.gitignore`. When no paths are supplied, recursive discovery starts from the
+current directory and skips ignored paths. An explicit selection that contains
+no Markdown files exits with an error instead of reporting an empty clean run.
 
 ```sh
 node dist/cli.js check fixtures --format markdown --output reports/runbooklint.md
