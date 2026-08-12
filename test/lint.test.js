@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 import { runCheck } from '../dist/index.js';
 
@@ -25,4 +26,18 @@ test('missing rollback fixture reports rollback coverage gap', () => {
 test('approval bypass wording is flagged in shell procedures', () => {
   const { result } = runCheck({ cwd: process.cwd(), paths: ['fixtures/approval-bypass.md'], format: 'json', failOn: 'error' });
   assert.ok(result.findings.some((finding) => finding.ruleId === 'approval-bypass'));
+});
+
+test('tilde shell fences receive destructive-command checks and fail the CLI threshold', () => {
+  const { result, failed } = runCheck({ cwd: process.cwd(), paths: ['fixtures/risky-tilde-fence.md'], format: 'json', failOn: 'warning' });
+  const finding = result.findings.find((item) => item.ruleId === 'dangerous-delete');
+  assert.equal(failed, true);
+  assert.equal(finding?.line, 15);
+
+  const cli = spawnSync(process.execPath, ['dist/cli.js', 'check', 'fixtures/risky-tilde-fence.md', '--format', 'json', '--fail-on', 'warning'], {
+    cwd: process.cwd(),
+    encoding: 'utf8',
+  });
+  assert.equal(cli.status, 1, cli.stderr);
+  assert.ok(JSON.parse(cli.stdout).findings.some((item) => item.ruleId === 'dangerous-delete' && item.line === 15));
 });
