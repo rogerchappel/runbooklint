@@ -58,7 +58,7 @@ node dist/cli.js check fixtures --format json --output reports/runbooklint.json
 - Required sections such as purpose, scope, prerequisites, procedure, validation, and rollback.
 - Owner or handoff contacts.
 - Environment scope.
-- Shell code fences containing dangerous patterns such as `rm -rf`, `sudo`, `curl | bash`, force pushes, and production-impacting commands.
+- Shell code fences containing dangerous patterns such as `rm -rf`, `sudo`, `curl | bash`, force pushes, and production-impacting commands. Both backtick (`` ```bash ``) and tilde (`~~~bash`) CommonMark fence syntax are supported, including longer matching delimiters and info strings.
 - TODO/TBD/FIXME placeholders.
 - Undefined `{{VARIABLE}}` and `${VARIABLE}` placeholders.
 - Banned vague phrases configured by policy.

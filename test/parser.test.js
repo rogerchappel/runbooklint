@@ -12,3 +12,13 @@ test('parser extracts headings, fences, checklists, links and variables', () => 
   assert.equal(doc.links.length, 1);
   assert.ok(doc.variables.has('TARGET_ENV'));
 });
+
+test('parser extracts tilde fences with info strings and matching close delimiters', () => {
+  const content = '# Procedure\n~~~bash session=production\necho ready\n~~~\ntext\n~~~~zsh\necho done\n~~~\n~~~~~\n';
+  const doc = parseMarkdown('tilde-fences.md', content);
+
+  assert.deepEqual(doc.codeFences, [
+    { language: 'bash', content: 'echo ready', startLine: 2, endLine: 4 },
+    { language: 'zsh', content: 'echo done\n~~~', startLine: 6, endLine: 9 },
+  ]);
+});

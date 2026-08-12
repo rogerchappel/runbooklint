@@ -12,23 +12,34 @@ export function parseMarkdown(path: string, content: string): MarkdownDocument {
   const links = [];
   const variables = new Map<string, number[]>();
   const todos = [];
-  let fence: { language: string; startLine: number; body: string[] } | undefined;
+  let fence: { language: string; marker: '`' | '~'; length: number; startLine: number; body: string[] } | undefined;
 
   for (let index = 0; index < lines.length; index += 1) {
     const lineNo = index + 1;
     const line = lines[index] ?? '';
-    const fenceMatch = line.match(/^```\s*([^`]*)\s*$/);
-    if (fenceMatch) {
-      if (fence) {
+    const fenceMatch = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    if (fence) {
+      const closingMatch = line.match(/^ {0,3}(`+|~+)[ \t]*$/);
+      const delimiter = closingMatch?.[1] ?? '';
+      if (delimiter.startsWith(fence.marker) && delimiter.length >= fence.length) {
         codeFences.push({ language: fence.language, content: fence.body.join('\n'), startLine: fence.startLine, endLine: lineNo });
         fence = undefined;
-      } else {
-        fence = { language: fenceMatch[1]?.trim() ?? '', startLine: lineNo, body: [] };
+        continue;
       }
+      fence.body.push(line);
       continue;
     }
-    if (fence) {
-      fence.body.push(line);
+    if (fenceMatch) {
+      const delimiter = fenceMatch[1] ?? '';
+      const info = fenceMatch[2]?.trim() ?? '';
+      if (delimiter.startsWith('`') && info.includes('`')) continue;
+      fence = {
+        language: info.split(/\s+/, 1)[0] ?? '',
+        marker: delimiter[0] as '`' | '~',
+        length: delimiter.length,
+        startLine: lineNo,
+        body: []
+      };
       continue;
     }
 
