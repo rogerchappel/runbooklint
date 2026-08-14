@@ -45,7 +45,9 @@ runbooklint init [--preset oss-release|incident|agent-handoff] [--print] [--forc
 Markdown is the default report format. JSON is stable and deterministic for automation.
 Explicit file and directory paths are always checked, even when they match
 `.gitignore`. When no paths are supplied, recursive discovery starts from the
-current directory and skips ignored paths. An explicit selection that contains
+current directory and skips ignored paths. Rules are evaluated in order, and
+`!` rules can re-include files (for example, `*.md` followed by `!keep.md`).
+An explicit selection that contains
 no Markdown files exits with an error instead of reporting an empty clean run.
 
 ```sh
@@ -108,7 +110,7 @@ RunbookLint is conservative. It parses Markdown and reports likely issues; it do
 
 - Markdown parsing is intentionally lightweight and optimized for runbooks, not every CommonMark edge case.
 - Risk rules are pattern-based and can produce false positives or false negatives.
-- `.gitignore` support covers common deterministic path ignores, not every advanced gitignore feature.
+- `.gitignore` support covers ordered ignore and negation rules with `*` path-segment wildcards. Nested `.gitignore` files, `**`, `?`, character ranges, and escaped leading `#` or `!` are not supported.
 - Inline suppressions and SARIF output are planned but not yet implemented.
 
 ## Development
