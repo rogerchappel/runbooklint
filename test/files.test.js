@@ -37,6 +37,27 @@ test('default discovery continues to respect gitignore', () => {
   });
 });
 
+test('default discovery honors ordered gitignore negation', () => {
+  withFixture((cwd) => {
+    writeFileSync(join(cwd, '.gitignore'), '*.md\n!included.md\n');
+    assert.deepEqual(collectMarkdownFiles(cwd, []), [join(cwd, 'included.md')]);
+  });
+});
+
+test('later gitignore rules can exclude a re-included Markdown file', () => {
+  withFixture((cwd) => {
+    writeFileSync(join(cwd, '.gitignore'), '*.md\n!included.md\nincluded.md\n');
+    assert.deepEqual(collectMarkdownFiles(cwd, []), []);
+  });
+});
+
+test('explicit Markdown files remain checked when gitignore negates other paths', () => {
+  withFixture((cwd) => {
+    writeFileSync(join(cwd, '.gitignore'), '*.md\n!included.md\n');
+    assert.deepEqual(collectMarkdownFiles(cwd, ['ignored.md']), [join(cwd, 'ignored.md')]);
+  });
+});
+
 test('explicit inputs without Markdown files fail loudly', () => {
   withFixture((cwd) => {
     assert.throws(

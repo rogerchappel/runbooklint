@@ -12,15 +12,21 @@ function readGitignore(cwd: string): string[] {
 
 function ignored(rel: string, patterns: string[]): boolean {
   const normalized = rel.replace(/\\/g, '/');
-  return patterns.some((pattern) => {
-    const clean = pattern.replace(/^\//, '').replace(/\/$/, '');
-    if (!clean) return false;
-    if (clean.includes('*')) {
-      const re = new RegExp(`^${clean.split('*').map(escapeRegExp).join('.*')}$`);
-      return re.test(normalized);
-    }
-    return normalized === clean || normalized.startsWith(`${clean}/`) || normalized.endsWith(`/${clean}`);
-  });
+  let result = false;
+  for (const pattern of patterns) {
+    const negated = pattern.startsWith('!');
+    const value = negated ? pattern.slice(1) : pattern;
+    const anchored = value.startsWith('/');
+    const clean = value.replace(/^\//, '').replace(/\/$/, '');
+    if (!clean) continue;
+    const pathPattern = clean.includes('/');
+    const source = clean.split('*').map(escapeRegExp).join('[^/]*');
+    const re = anchored || pathPattern
+      ? new RegExp(`^${source}(?:/.*)?$`)
+      : new RegExp(`(?:^|/)${source}(?:/.*)?$`);
+    if (re.test(normalized)) result = !negated;
+  }
+  return result;
 }
 
 function escapeRegExp(value: string): string {
