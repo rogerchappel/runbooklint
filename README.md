@@ -43,6 +43,11 @@ runbooklint init [--preset oss-release|incident|agent-handoff] [--print] [--forc
 ### Reports
 
 Markdown is the default report format. JSON is stable and deterministic for automation.
+Markdown reports render rule IDs and file locations as safely delimited inline
+code. Finding messages and suggestions escape Markdown punctuation and convert
+line breaks to `<br>`, so policy-controlled text remains readable without
+creating headings, lists, links, or other report structure. JSON values are
+emitted unchanged.
 Explicit file and directory paths are always checked, even when they match
 `.gitignore`. When no paths are supplied, recursive discovery starts from the
 current directory and skips ignored paths. Rules are evaluated in order, and
