@@ -2,6 +2,20 @@ import type { Finding, LintResult, Severity } from './types.js';
 
 const severities: Severity[] = ['error', 'warning', 'info'];
 
+function inlineCode(value: string): string {
+  const runs = value.match(/`+/g) ?? [];
+  const fence = '`'.repeat(Math.max(1, ...runs.map((run) => run.length + 1)));
+  const padding = value.startsWith('`') || value.endsWith('`') || value.startsWith(' ') || value.endsWith(' ') ? ' ' : '';
+  return `${fence}${padding}${value}${padding}${fence}`;
+}
+
+function markdownText(value: string): string {
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/([`*_{}\[\]()<>#+\-.!|])/g, '\\$1')
+    .replace(/\r?\n/g, '<br>');
+}
+
 export function summarize(files: string[], findings: Finding[]): LintResult['summary'] {
   return {
     files: files.length,
@@ -36,8 +50,8 @@ export function renderMarkdown(result: LintResult): string {
     lines.push(`## ${severity.toUpperCase()}`);
     lines.push('');
     for (const item of group) {
-      lines.push(`- \`${item.ruleId}\` ${item.file}:${item.line} — ${item.message}`);
-      lines.push(`  - Fix: ${item.suggestion}`);
+      lines.push(`- ${inlineCode(item.ruleId)} ${inlineCode(`${item.file}:${item.line}`)} — ${markdownText(item.message)}`);
+      lines.push(`  - Fix: ${markdownText(item.suggestion)}`);
     }
     lines.push('');
   }
