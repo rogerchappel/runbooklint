@@ -34,7 +34,7 @@ Treat warnings about destructive commands, approval bypasses, force pushes, prod
 
 ```bash
 runbooklint check docs/RUNBOOK.md --fail-on warning
-runbooklint check docs --format json --out reports/runbooklint.json
+runbooklint check docs --format json --output reports/runbooklint.json
 ```
 
 ## Verification
