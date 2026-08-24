@@ -35,8 +35,8 @@ test('markdown reports contain dynamic finding fields without changing structure
   };
 
   const markdown = renderMarkdown(result);
-  assert.match(markdown, /`policy`rule`/);
-  assert.match(markdown, /`odd`name\.md:7`/);
+  assert.match(markdown, /``policy`rule``/);
+  assert.match(markdown, /``odd`name\.md:7``/);
   assert.equal(markdown.match(/^## /gm)?.length, 1);
   assert.equal(markdown.match(/^- /gm)?.length, 1);
   assert.doesNotMatch(markdown, /^## INJECTED/m);
