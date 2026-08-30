@@ -13,6 +13,15 @@ test('parser extracts headings, fences, checklists, links and variables', () => 
   assert.ok(doc.variables.has('TARGET_ENV'));
 });
 
+test('parser preserves balanced destination parentheses and removes optional link titles', () => {
+  const doc = parseMarkdown('links.md', '[guide](docs/guide.md "Guide title")\n[advanced](docs/guide_(advanced).md)');
+
+  assert.deepEqual(doc.links, [
+    { text: 'guide', href: 'docs/guide.md', line: 1 },
+    { text: 'advanced', href: 'docs/guide_(advanced).md', line: 2 },
+  ]);
+});
+
 test('parser extracts tilde fences with info strings and matching close delimiters', () => {
   const content = '# Procedure\n~~~bash session=production\necho ready\n~~~\ntext\n~~~~zsh\necho done\n~~~\n~~~~~\n';
   const doc = parseMarkdown('tilde-fences.md', content);
