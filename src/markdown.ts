@@ -4,6 +4,33 @@ function slugify(text: string): string {
   return text.toLowerCase().replace(/`/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function inlineLinks(line: string): Array<{ text: string; href: string }> {
+  const links = [];
+  const opening = /\[([^\]]+)]\(/g;
+  for (let match = opening.exec(line); match; match = opening.exec(line)) {
+    let depth = 1;
+    let cursor = opening.lastIndex;
+    let quote = '';
+    for (; cursor < line.length && depth > 0; cursor += 1) {
+      const character = line[cursor] ?? '';
+      if ((character === '"' || character === "'") && line[cursor - 1] !== '\\') {
+        quote = quote === character ? '' : quote || character;
+      } else if (!quote && character === '(') {
+        depth += 1;
+      } else if (!quote && character === ')') {
+        depth -= 1;
+      }
+    }
+    if (depth !== 0) continue;
+    const body = line.slice(opening.lastIndex, cursor - 1).trim();
+    const title = body.match(/\s+(?:"[^"]*"|'[^']*')\s*$/);
+    const href = body.slice(0, title?.index ?? body.length).trim();
+    if (href) links.push({ text: match[1] ?? '', href });
+    opening.lastIndex = cursor;
+  }
+  return links;
+}
+
 export function parseMarkdown(path: string, content: string): MarkdownDocument {
   const lines = content.replace(/\r\n/g, '\n').split('\n');
   const headings = [];
@@ -52,8 +79,8 @@ export function parseMarkdown(path: string, content: string): MarkdownDocument {
     const checklist = line.match(/^\s*[-*]\s+\[([ xX])]\s+(.+)$/);
     if (checklist) checklistItems.push({ checked: (checklist[1] ?? '').toLowerCase() === 'x', text: checklist[2] ?? '', line: lineNo });
 
-    for (const match of line.matchAll(/\[([^\]]+)]\(([^)]+)\)/g)) {
-      links.push({ text: match[1] ?? '', href: match[2] ?? '', line: lineNo });
+    for (const link of inlineLinks(line)) {
+      links.push({ ...link, line: lineNo });
     }
 
     for (const match of line.matchAll(/\{\{\s*([A-Z][A-Z0-9_]*)\s*}}|\$\{\s*([A-Z][A-Z0-9_]*)\s*}/g)) {
