@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -43,6 +43,25 @@ test('tilde shell fences receive destructive-command checks and fail the CLI thr
   });
   assert.equal(cli.status, 1, cli.stderr);
   assert.ok(JSON.parse(cli.stdout).findings.some((item) => item.ruleId === 'dangerous-delete' && item.line === 15));
+});
+
+test('CLI creates output parent directories and overwrites an existing report', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'runbooklint-output-'));
+  const report = join(directory, 'reports', 'nested', 'runbooklint.json');
+
+  try {
+    const args = ['dist/cli.js', 'check', 'fixtures/clean-release.md', '--format', 'json', '--output', report];
+    const first = spawnSync(process.execPath, args, { cwd: process.cwd(), encoding: 'utf8' });
+    assert.equal(first.status, 0, first.stderr);
+    assert.equal(JSON.parse(readFileSync(report, 'utf8')).summary.error, 0);
+
+    writeFileSync(report, 'stale report');
+    const second = spawnSync(process.execPath, args, { cwd: process.cwd(), encoding: 'utf8' });
+    assert.equal(second.status, 0, second.stderr);
+    assert.equal(JSON.parse(readFileSync(report, 'utf8')).summary.error, 0);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 test('local link checks accept titles and balanced parentheses but report missing targets', () => {
