@@ -113,7 +113,7 @@ RunbookLint is conservative. It parses Markdown and reports likely issues; it do
 
 ## Limitations
 
-- Markdown parsing is intentionally lightweight and optimized for runbooks, not every CommonMark edge case. Inline links support balanced parentheses in destinations and optional quoted titles.
+- Markdown parsing is intentionally lightweight and optimized for runbooks, not every CommonMark edge case. Inline links support balanced parentheses, angle-bracket destinations such as `[guide](<docs/release guide.md>)`, and optional quoted titles. Destinations are checked as written after removing the angle brackets; percent-encoded or backslash-escaped paths are not decoded.
 - Risk rules are pattern-based and can produce false positives or false negatives.
 - `.gitignore` support covers ordered ignore and negation rules with `*` path-segment wildcards. Nested `.gitignore` files, `**`, `?`, character ranges, and escaped leading `#` or `!` are not supported.
 - Inline suppressions and SARIF output are planned but not yet implemented.
