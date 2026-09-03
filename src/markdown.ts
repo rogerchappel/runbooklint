@@ -24,7 +24,10 @@ function inlineLinks(line: string): Array<{ text: string; href: string }> {
     if (depth !== 0) continue;
     const body = line.slice(opening.lastIndex, cursor - 1).trim();
     const title = body.match(/\s+(?:"[^"]*"|'[^']*')\s*$/);
-    const href = body.slice(0, title?.index ?? body.length).trim();
+    const rawHref = body.slice(0, title?.index ?? body.length).trim();
+    const href = rawHref.startsWith('<') && rawHref.endsWith('>')
+      ? rawHref.slice(1, -1)
+      : rawHref;
     if (href) links.push({ text: match[1] ?? '', href });
     opening.lastIndex = cursor;
   }
