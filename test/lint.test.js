@@ -69,11 +69,12 @@ test('local link checks accept titles and balanced parentheses but report missin
   mkdirSync(join(cwd, 'docs'));
   writeFileSync(join(cwd, 'docs', 'guide.md'), 'guide');
   writeFileSync(join(cwd, 'docs', 'guide_(advanced).md'), 'advanced');
-  writeFileSync(join(cwd, 'runbook.md'), '[guide](docs/guide.md "Guide title")\n[advanced](docs/guide_(advanced).md)\n[missing](docs/missing_(advanced).md)\n');
+  writeFileSync(join(cwd, 'docs', 'release guide.md'), 'release');
+  writeFileSync(join(cwd, 'runbook.md'), '[guide](docs/guide.md "Guide title")\n[advanced](docs/guide_(advanced).md)\n[release](<docs/release guide.md>)\n[missing](<docs/missing guide.md>)\n');
 
   const { result } = runCheck({ cwd, paths: ['runbook.md'], format: 'json', failOn: 'warning' });
   const broken = result.findings.filter((finding) => finding.ruleId === 'broken-local-link');
   assert.deepEqual(broken.map(({ line, message }) => ({ line, message })), [
-    { line: 3, message: 'Local link target does not exist: docs/missing_(advanced).md.' },
+    { line: 4, message: 'Local link target does not exist: docs/missing guide.md.' },
   ]);
 });
