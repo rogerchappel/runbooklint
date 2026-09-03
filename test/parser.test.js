@@ -14,11 +14,12 @@ test('parser extracts headings, fences, checklists, links and variables', () => 
 });
 
 test('parser preserves balanced destination parentheses and removes optional link titles', () => {
-  const doc = parseMarkdown('links.md', '[guide](docs/guide.md "Guide title")\n[advanced](docs/guide_(advanced).md)');
+  const doc = parseMarkdown('links.md', '[guide](docs/guide.md "Guide title")\n[advanced](docs/guide_(advanced).md)\n[release](<docs/release guide.md> "Release guide")');
 
   assert.deepEqual(doc.links, [
     { text: 'guide', href: 'docs/guide.md', line: 1 },
     { text: 'advanced', href: 'docs/guide_(advanced).md', line: 2 },
+    { text: 'release', href: 'docs/release guide.md', line: 3 },
   ]);
 });
 
