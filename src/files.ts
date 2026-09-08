@@ -33,16 +33,18 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export function collectMarkdownFiles(cwd: string, inputs: string[]): string[] {
+export function collectMarkdownFiles(cwd: string, inputs: string[], excludedPath?: string): string[] {
   const patterns = readGitignore(cwd);
   const visited = new Set<string>();
   const out: string[] = [];
   const explicit = inputs.length > 0;
   const queue = explicit ? inputs : ['.'];
+  const excluded = excludedPath ? resolve(cwd, excludedPath) : undefined;
 
   function visit(abs: string, respectGitignore: boolean): void {
     const rel = relative(cwd, abs) || '.';
     if (respectGitignore && rel !== '.' && ignored(rel, patterns)) return;
+    if (abs === excluded) return;
     if (visited.has(abs)) return;
     visited.add(abs);
 

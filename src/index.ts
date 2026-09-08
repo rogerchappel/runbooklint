@@ -1,5 +1,5 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, relative } from 'node:path';
+import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, extname, relative, resolve } from 'node:path';
 import { collectMarkdownFiles } from './files.js';
 import { parseMarkdown } from './markdown.js';
 import { loadPolicy } from './policy.js';
@@ -14,15 +14,24 @@ export type { CheckOptions, Finding, LintResult, MarkdownDocument, Policy, Sever
 
 export function runCheck(options: CheckOptions): { result: LintResult; output: string; failed: boolean } {
   const policy = loadPolicy(options.cwd, options.policyPath);
-  const files = collectMarkdownFiles(options.cwd, options.paths);
+  const outputPath = options.output ? resolve(options.cwd, options.output) : undefined;
+  if (outputPath) {
+    const explicitMarkdownFiles = options.paths
+      .map((input) => resolve(options.cwd, input))
+      .filter((input) => statSync(input).isFile() && ['.md', '.markdown'].includes(extname(input).toLowerCase()));
+    if (explicitMarkdownFiles.includes(outputPath)) {
+      throw new Error(`Output path aliases an explicitly selected Markdown input: ${relative(options.cwd, outputPath)}`);
+    }
+  }
+  const files = collectMarkdownFiles(options.cwd, options.paths, outputPath);
   const findings = files.flatMap((file) => lintDocument(options.cwd, parseMarkdown(file, readFileSync(file, 'utf8')), policy));
   findings.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line || a.ruleId.localeCompare(b.ruleId));
   const relFiles = files.map((file) => relative(options.cwd, file));
   const result: LintResult = { files: relFiles, findings, summary: summarize(relFiles, findings) };
   const output = options.format === 'json' ? renderJson(result) : renderMarkdown(result);
-  if (options.output) {
-    mkdirSync(dirname(options.output), { recursive: true });
-    writeFileSync(options.output, output, 'utf8');
+  if (outputPath) {
+    mkdirSync(dirname(outputPath), { recursive: true });
+    writeFileSync(outputPath, output, 'utf8');
   }
   return { result, output, failed: shouldFail(findings, options.failOn) };
 }
