@@ -54,6 +54,11 @@ current directory and skips ignored paths. Rules are evaluated in order, and
 `!` rules can re-include files (for example, `*.md` followed by `!keep.md`).
 An explicit selection that contains
 no Markdown files exits with an error instead of reporting an empty clean run.
+When `--output` names a Markdown file, directory and default discovery exclude
+that exact file so repeated runs never lint their own report; other files with
+the same basename remain eligible. An output path that resolves to an explicitly
+selected Markdown file is rejected before writing, whether either path is
+relative or absolute, so a source runbook cannot be overwritten.
 
 ```sh
 node dist/cli.js check fixtures --format markdown --output reports/runbooklint.md
