@@ -64,6 +64,49 @@ test('CLI creates output parent directories and overwrites an existing report', 
   }
 });
 
+test('library rejects an output path that aliases an explicit Markdown input', () => {
+  const source = join(process.cwd(), 'fixtures', 'clean-release.md');
+  assert.throws(
+    () => runCheck({ cwd: process.cwd(), paths: ['fixtures/clean-release.md'], format: 'json', failOn: 'error', output: source }),
+    /Output path aliases an explicitly selected Markdown input/,
+  );
+});
+
+test('CLI never overwrites an explicit source through a relative output alias', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'runbooklint-collision-'));
+  const source = join(directory, 'source.md');
+  const content = readFileSync('fixtures/clean-release.md', 'utf8');
+  writeFileSync(source, content);
+
+  try {
+    const cli = spawnSync(process.execPath, [join(process.cwd(), 'dist/cli.js'), 'check', './source.md', '--format', 'json', '--output', source], {
+      cwd: directory,
+      encoding: 'utf8',
+    });
+    assert.equal(cli.status, 2);
+    assert.match(cli.stderr, /Output path aliases an explicitly selected Markdown input/);
+    assert.equal(readFileSync(source, 'utf8'), content);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test('repeated directory checks do not lint their own Markdown report', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'runbooklint-repeat-'));
+  writeFileSync(join(directory, 'runbook.md'), readFileSync('fixtures/clean-release.md', 'utf8'));
+  writeFileSync(join(directory, 'report-copy.md'), readFileSync('fixtures/clean-release.md', 'utf8'));
+
+  try {
+    const report = join(directory, 'report.md');
+    const options = { cwd: directory, paths: ['.'], format: 'markdown', failOn: 'error', output: './report.md' };
+    assert.deepEqual(runCheck(options).result.files, ['report-copy.md', 'runbook.md']);
+    assert.deepEqual(runCheck(options).result.files, ['report-copy.md', 'runbook.md']);
+    assert.ok(readFileSync(report, 'utf8').startsWith('# RunbookLint Report'));
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
 test('local link checks accept titles and balanced parentheses but report missing targets', () => {
   const cwd = mkdtempSync(join(tmpdir(), 'runbooklint-links-'));
   mkdirSync(join(cwd, 'docs'));

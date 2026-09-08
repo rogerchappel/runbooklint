@@ -31,6 +31,20 @@ test('explicit ignored directories are traversed', () => {
   });
 });
 
+test('directory discovery excludes only the exact requested report path', () => {
+  withFixture((cwd) => {
+    writeFileSync(join(cwd, 'report.md'), '# Existing report\n');
+    mkdirSync(join(cwd, 'nested'));
+    writeFileSync(join(cwd, 'nested', 'report.md'), '# Same basename\n');
+    assert.deepEqual(collectMarkdownFiles(cwd, ['.'], join(cwd, 'report.md')), [
+      join(cwd, 'ignored-docs', 'runbook.md'),
+      join(cwd, 'ignored.md'),
+      join(cwd, 'included.md'),
+      join(cwd, 'nested', 'report.md'),
+    ]);
+  });
+});
+
 test('default discovery continues to respect gitignore', () => {
   withFixture((cwd) => {
     assert.deepEqual(collectMarkdownFiles(cwd, []), [join(cwd, 'included.md')]);
