@@ -12,8 +12,11 @@ permissions:
 
 jobs:
   test:
-    name: Test and build
+    name: Test and build (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20', '24']
 
     steps:
       - name: Check out repository
@@ -22,7 +25,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: Install dependencies
