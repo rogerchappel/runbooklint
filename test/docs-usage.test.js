@@ -5,6 +5,44 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 
+function parseShellWords(input) {
+  const words = [];
+  let word = '';
+  let quote = null;
+  let escaped = false;
+  let started = false;
+
+  for (const character of input) {
+    if (escaped) {
+      word += character;
+      escaped = false;
+      started = true;
+    } else if (character === '\\' && quote !== "'") {
+      escaped = true;
+      started = true;
+    } else if (quote) {
+      if (character === quote) quote = null;
+      else word += character;
+      started = true;
+    } else if (character === "'" || character === '\"') {
+      quote = character;
+      started = true;
+    } else if (/\s/.test(character)) {
+      if (started) words.push(word);
+      word = '';
+      started = false;
+    } else {
+      word += character;
+      started = true;
+    }
+  }
+
+  assert.equal(escaped, false, 'documented command must not end with an escape');
+  assert.equal(quote, null, 'documented command must have balanced quotes');
+  if (started) words.push(word);
+  return words;
+}
+
 test('documented CI lint target exits successfully', () => {
   const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const result = spawnSync(npm, ['run', 'docs:check'], {
@@ -28,10 +66,10 @@ test('shipped skill JSON example uses the supported output option', () => {
   assert.ok(command, 'SKILL.md must include the JSON report example');
 
   const directory = mkdtempSync(join(tmpdir(), 'runbooklint-skill-example-'));
-  const report = join(directory, 'runbooklint.json');
+  const report = join(directory, 'runbooklint report.json');
 
   try {
-    const args = command.trim().split(/\s+/).slice(1);
+    const args = parseShellWords(command).slice(1);
     args[1] = 'fixtures/clean-release.md';
     args[args.indexOf('--output') + 1] = report;
 
