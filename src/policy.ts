@@ -68,6 +68,22 @@ export function loadPolicy(cwd: string, policyPath?: string): Policy {
   if (!found) return structuredClone(defaultPolicy);
 
   const parsed = JSON.parse(readFileSync(found, 'utf8')) as Partial<Policy>;
+  if (parsed.commandRiskPatterns !== undefined) {
+    if (!Array.isArray(parsed.commandRiskPatterns)) {
+      throw new Error('Invalid policy commandRiskPatterns: expected an array of risk pattern objects.');
+    }
+    parsed.commandRiskPatterns.forEach((risk, index) => {
+      if (!risk || typeof risk.pattern !== 'string') {
+        throw new Error(`Invalid policy commandRiskPatterns[${index}].pattern: expected a regular expression string.`);
+      }
+      try {
+        new RegExp(risk.pattern, 'i');
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new Error(`Invalid policy commandRiskPatterns[${index}].pattern (${JSON.stringify(risk.pattern)}): ${detail}`);
+      }
+    });
+  }
   return {
     ...structuredClone(defaultPolicy),
     ...parsed,
