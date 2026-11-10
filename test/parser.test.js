@@ -32,3 +32,18 @@ test('parser extracts tilde fences with info strings and matching close delimite
     { language: 'zsh', content: 'echo done\n~~~', startLine: 6, endLine: 9 },
   ]);
 });
+
+test('Markdown constructs inside backtick and tilde fences are captured, not parsed as document content', () => {
+  const content = '# Real heading\n```md\n# Fake heading\n[bad](missing.md)\nTODO {{FAKE_VAR}}\n- [ ] fake task\n```\n~~~md\n## Also fake\n[bad](other.md) FIXME ${ALSO_FAKE}\n- [x] fake tilde task\n~~~\n';
+  const doc = parseMarkdown('fenced-content.md', content);
+
+  assert.deepEqual(doc.headings.map(({ text }) => text), ['Real heading']);
+  assert.deepEqual(doc.links, []);
+  assert.deepEqual(doc.todos, []);
+  assert.deepEqual(doc.checklistItems, []);
+  assert.deepEqual([...doc.variables.keys()], []);
+  assert.deepEqual(doc.codeFences.map(({ content: body }) => body), [
+    '# Fake heading\n[bad](missing.md)\nTODO {{FAKE_VAR}}\n- [ ] fake task',
+    '## Also fake\n[bad](other.md) FIXME ${ALSO_FAKE}\n- [x] fake tilde task',
+  ]);
+});
