@@ -51,6 +51,25 @@ test('default discovery continues to respect gitignore', () => {
   });
 });
 
+test('default discovery supports single-character and bracket-class gitignore wildcards', () => {
+  withFixture((cwd) => {
+    writeFileSync(join(cwd, '.gitignore'), 'guide?.md\nchapter[12].md\n');
+    writeFileSync(join(cwd, 'guide1.md'), '# One character\n');
+    writeFileSync(join(cwd, 'guides.md'), '# One character\n');
+    writeFileSync(join(cwd, 'guide12.md'), '# Two characters\n');
+    writeFileSync(join(cwd, 'chapter1.md'), '# Bracket match\n');
+    writeFileSync(join(cwd, 'chapter2.md'), '# Bracket match\n');
+    writeFileSync(join(cwd, 'chapter3.md'), '# Bracket non-match\n');
+    assert.deepEqual(collectMarkdownFiles(cwd, []), [
+      join(cwd, 'chapter3.md'),
+      join(cwd, 'included.md'),
+      join(cwd, 'ignored-docs', 'runbook.md'),
+      join(cwd, 'ignored.md'),
+      join(cwd, 'guide12.md'),
+    ].sort((a, b) => a.localeCompare(b)));
+  });
+});
+
 test('default discovery honors ordered gitignore negation', () => {
   withFixture((cwd) => {
     writeFileSync(join(cwd, '.gitignore'), '*.md\n!included.md\n');

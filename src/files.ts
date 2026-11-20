@@ -20,13 +20,39 @@ function ignored(rel: string, patterns: string[]): boolean {
     const clean = value.replace(/^\//, '').replace(/\/$/, '');
     if (!clean) continue;
     const pathPattern = clean.includes('/');
-    const source = clean.split('*').map(escapeRegExp).join('[^/]*');
+    const source = globToRegExp(clean);
     const re = anchored || pathPattern
       ? new RegExp(`^${source}(?:/.*)?$`)
       : new RegExp(`(?:^|/)${source}(?:/.*)?$`);
     if (re.test(normalized)) result = !negated;
   }
   return result;
+}
+
+function globToRegExp(pattern: string): string {
+  let source = '';
+  for (let i = 0; i < pattern.length; i += 1) {
+    const char = pattern[i]!;
+    if (char === '*') {
+      source += '[^/]*';
+    } else if (char === '?') {
+      source += '[^/]';
+    } else if (char === '[') {
+      const end = pattern.indexOf(']', i + 1);
+      if (end === -1) {
+        source += '\\\\[';
+        continue;
+      }
+      let characterClass = pattern.slice(i + 1, end);
+      if (characterClass.startsWith('!')) characterClass = `^${characterClass.slice(1)}`;
+      else if (characterClass.startsWith('^')) characterClass = `\\\\${characterClass}`;
+      source += `[${characterClass.replace(/\\\\/g, '\\\\\\\\')}]`;
+      i = end;
+    } else {
+      source += escapeRegExp(char);
+    }
+  }
+  return source;
 }
 
 function escapeRegExp(value: string): string {
