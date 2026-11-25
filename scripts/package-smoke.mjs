@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const requiredFiles = [
+  'package.json',
   'dist/cli.js',
   'dist/index.js',
   'dist/index.d.ts',
