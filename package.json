@@ -15,6 +15,7 @@
     }
   },
   "files": [
+    "package.json",
     "dist",
     "docs/POLICY.md",
     "examples",
