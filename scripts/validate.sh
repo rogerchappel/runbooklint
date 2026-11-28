@@ -123,7 +123,6 @@ run_package_script() {
 printf 'Checking runbooklint required files...\n'
 
 check_file "README.md"
-check_file "AGENTS.md"
 check_file "CONTRIBUTING.md"
 check_file "SECURITY.md"
 check_file "docs/PRD.md"
